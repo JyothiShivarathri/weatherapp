@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body{
+            text-align: center;
+            background-image: url("https://img.freepik.com/free-vector/beautiful-decorative-soft-colorful-watercolor-texture-background_1055-14290.jpghttps://img.freepik.com/free-photo/soft-vintage-gradient-blur-background-with-pastel-colored-well-use-as-studio-room-product-presentation-banner_1258-71580.jpg");
+        }
+        input{
+            height:50px;
+            width:300px;
+        }
+        #container {
+            margin-top: 30px;
+            margin-left: 400px;
+            border: 2px solid black;
+            border-radius: 10px;
+            background-image: url("");
+            background-size: cover;
+            height:400px;
+            width:500px; /* Ensure the background image covers the entire container */
+        }
+       h2{
+        margin-top: 100px;
+    }
+    
+        
+    </style>
+</head>
+<body>
+    <h1>Weather Forecast</h1>
+    <input type="text" id="location" placeholder="Enter city name">
+    <button onclick="getWeather()">Search</button>
+    <div id="container">
+        <div id="weatherBackground"></div>
+    <div id="weather">
+        <!--<div id="weatherBackground"></div>!-->
+        <div id="weatherInfo"></div>
+    </div>
+    </div>
+
+    <script>
+        function getWeather() {
+            const locationInput = document.getElementById('location').value.trim();
+            if (!locationInput) {
+                alert('Please enter a location.');
+                return;
+            }
+
+            
+            const apiKey = 'e7eabf915359ba77ba1e4f65f90fe6c4';
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${locationInput}&appid=${apiKey}&units=metric`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('City not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+    
+                    const container = document.getElementById('container');
+                   container.style.backgroundImage = `url('${getWeatherImage(data.weather[0].main)}')`;
+                   const weather= data.weather[0].main;
+                   const temperature = data.main.temp;
+                   const weatherDescription = data.weather[0].description;
+                   const atmosphericPressure = data.main.pressure; // Atmospheric pressure in hPa
+                    const windSpeed = data.wind.speed;
+                    const weatherDiv = document.getElementById('weather');
+                    weatherDiv.innerHTML = `
+                    <h2>${data.name}</h2>
+                <p>Temperature: ${temperature}°C</p>
+                <p>Weather: ${weatherDescription}</p>
+                <p>Pressure: ${atmosphericPressure} hPa</p>
+                <p>Wind Speed: ${windSpeed} m/s</p>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    alert('City not found. Please enter a valid city name.');
+                });
+        }
+        function getWeatherImage(weather) {
+           
+            const images = {
+                'Haze': 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/8e216079544067.5cc6c4ae034be.gif',
+                'Clouds': 'https://www.shutterstock.com/image-vector/vector-blue-sky-clouds-anime-600nw-720355618.jpg',
+                'Rain': 'https://example.com/rain.jpg',
+                'mist': 'https://i.pinimg.com/originals/cc/51/a3/cc51a378a4accec027b87361dab54217.gif',
+                'Snow': 'https://example.com/snow.jpg',
+                'Sunny':"https://www.freeiconspng.com/thumbs/hot-png/hot-sun-png-hd-8.png"
+                // Add more weather conditions and corresponding image URLs as needed
+            };
+
+            // Default image if weather condition is not found in the mapping
+            const defaultImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaKHfmproc8xJzvdYt9SiwERlzl9yFuL0hKA&usqp=CAU';
+
+            // Return corresponding image URL or default image
+            return images[weather] || defaultImage;
+        }
+    </script>
+</body>
+</html>
